@@ -7,12 +7,14 @@ class ArtistBase(BaseModel):
     country: Optional[str] = None
     debut_year: Optional[int] = None
     biography: Optional[str] = None
+    website: Optional[str] = None
 
 class AlbumBase(BaseModel):
     title: str
     release_year: Optional[int] = None
     record_label: Optional[str] = None
     genre: Optional[str] = None
+    language: Optional[str] = None
 
 class TrackBase(BaseModel):
     title: str

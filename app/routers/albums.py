@@ -32,6 +32,20 @@ def delete_album(album_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Album not found")
     return {"message": "Album deleted successfully"}
 
+# Пагинация для получения всех альбомов
+@router.get("/albums/", response_model=schemas.PaginatedResponse[schemas.Album])
+def get_albums(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    query = db.query(models.Album)
+    total_count = query.count()
+    albums = query.offset(skip).limit(limit).all()
+
+    return schemas.PaginatedResponse(
+        data=albums,
+        total_count=total_count,
+        skip=skip,
+        limit=limit
+    )
+
 # SELECT ... WHERE с несколькими условиями.
 # Получить альбомы, которые соответствуют определенному жанру и были выпущены после заданного года.
 @router.get("/filter/", response_model=List[schemas.Album])

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Generic, TypeVar
 
 class ArtistBase(BaseModel):
     name: str
@@ -62,6 +62,17 @@ class Track(TrackBase):
     track_id: int
     artist_id: int
     album_id: int
+
+    class Config:
+        orm_mode = True
+
+T = TypeVar("T")
+
+class PaginatedResponse(Generic[T], BaseModel):
+    data: List[T]
+    total_count: int
+    skip: int
+    limit: int
 
     class Config:
         orm_mode = True

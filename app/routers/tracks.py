@@ -32,6 +32,20 @@ def delete_track(track_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Track not found")
     return {"message": "Track deleted successfully"}
 
+# Пагинация для получения всех треков
+@router.get("/tracks/", response_model=schemas.PaginatedResponse[schemas.Track])
+def get_tracks(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    query = db.query(models.Track)
+    total_count = query.count()
+    tracks = query.offset(skip).limit(limit).all()
+
+    return schemas.PaginatedResponse(
+        data=tracks,
+        total_count=total_count,
+        skip=skip,
+        limit=limit
+    )
+
 # SELECT ... WHERE с несколькими условиями.
 # Получить все треки, соответствующие определённому настроению и продолжительности.
 @router.get("/filter/", response_model=List[schemas.Track])

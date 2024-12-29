@@ -32,6 +32,21 @@ def delete_artist(artist_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Artist not found")
     return {"message": "Artist deleted successfully"}
 
+# Пагинация для получения всех артистов
+@router.get("/", response_model=schemas.PaginatedResponse[schemas.Artist])
+def get_artists(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    query = db.query(models.Artist)
+    total_count = query.count()
+    artists = query.offset(skip).limit(limit).all()
+
+    return schemas.PaginatedResponse(
+        data=artists,
+        total_count=total_count,
+        skip=skip,
+        limit=limit
+    )
+
+
 # SELECT ... WHERE с несколькими условиями.
 # Получить всех артистов, которые соответствуют определенному жанру и дебютировали после заданного года.
 @router.get("/filter/", response_model=List[schemas.Artist])

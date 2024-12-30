@@ -101,3 +101,45 @@ def sort_tracks(sort_by: str = "play_count", db: Session = Depends(get_db)):
 
     tracks = db.query(models.Track).order_by(getattr(models.Track, sort_by)).all()
     return tracks
+
+@router.put("/{track_id}/update_rating/")
+def update_rating(track_id: int, rating: float, db: Session = Depends(get_db)):
+    track = db.query(models.Track).filter(models.Track.track_id == track_id).first()
+    if not track:
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    if not track.metadata:
+        track.metadata = {}
+    track.metadata["rating"] = rating
+
+    db.commit()
+    return {"message": "Rating updated", "rating": rating}
+
+@router.put("/{track_id}/add_instruments/")
+def add_instruments(track_id: int, instruments: List[str], db: Session = Depends(get_db)):
+    track = db.query(models.Track).filter(models.Track.track_id == track_id).first()
+    if not track:
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    if not track.metadata:
+        track.metadata = {}
+
+    existing_instruments = track.metadata.get("instruments", [])
+    track.metadata["instruments"] = list(set(existing_instruments + instruments))
+
+    db.commit()
+    return {"message": "Instruments added", "instruments": track.metadata["instruments"]}
+
+@router.get("/search_by_rating/")
+def search_tracks_by_rating(min_rating: float = 0.0, db: Session = Depends(get_db)):
+    tracks = db.query(models.Track).filter(
+        models.Track.metadata["rating"].as_float() >= min_rating
+    ).all()
+    return tracks
+
+@router.get("/search_by_instrument/")
+def search_tracks_by_instrument(instrument: str, db: Session = Depends(get_db)):
+    tracks = db.query(models.Track).filter(
+        models.Track.metadata["instruments"].contains([instrument])
+    ).all()
+    return tracks

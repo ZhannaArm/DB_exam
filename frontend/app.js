@@ -49,7 +49,7 @@ const app = Vue.createApp({
         return;
       }
       await axios.delete(`${this.apiUrl}${entity}/${id}`);
-      this.loadEntities(entity);
+      await this.loadEntities(entity);
     },
     editEntity(entity, data) {
       this.formData = { ...data };
@@ -66,13 +66,13 @@ const app = Vue.createApp({
       this.showArtistForm = this.showAlbumForm = this.showTrackForm = false;
     },
     async deleteArtist(id) {
-      this.deleteEntity("artists", id);
+      await this.deleteEntity("artists", id);
     },
     async deleteAlbum(id) {
-      this.deleteEntity("albums", id);
+      await this.deleteEntity("albums", id);
     },
     async deleteTrack(id) {
-      this.deleteEntity("tracks", id);
+      await this.deleteEntity("tracks", id);
     },
     editArtist(artist) {
       this.editEntity("artists", artist);
@@ -86,10 +86,6 @@ const app = Vue.createApp({
     getArtistName(artistId) {
       const artist = this.artists.find(a => a.artist_id === artistId);
       return artist ? artist.name : "Неизвестный артист";
-    },
-    getAlbumName(albumId) {
-      const album = this.albums.find(a => a.album_id === albumId);
-      return album ? album.name : "Неизвестный альбом";
     },
     switchTab(tab) {
       this.activeTab = tab;

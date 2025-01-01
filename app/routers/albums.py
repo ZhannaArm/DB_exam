@@ -7,7 +7,7 @@ from app import models, schemas, crud
 
 router = APIRouter(prefix="/albums", tags=["albums"])
 
-@router.post("/", response_model=schemas.Album)
+@router.post("/create", response_model=schemas.Album)
 def create_album(album: schemas.AlbumCreate, db: Session = Depends(get_db)):
     return crud.create_album(db, album)
 
@@ -16,14 +16,14 @@ def get_album(album_id: int, db: Session = Depends(get_db)):
     album = crud.get_album(db, album_id)
     if not album:
         raise HTTPException(status_code=404, detail="Album not found")
-    return album
+    return schemas.Album.model_validate(album)
 
 @router.put("/{album_id}", response_model=schemas.Album)
 def update_album(album_id: int, album: schemas.AlbumUpdate, db: Session = Depends(get_db)):
     updated_album = crud.update_album(db, album_id, album)
     if not updated_album:
         raise HTTPException(status_code=404, detail="Album not found")
-    return updated_album
+    return schemas.Album.model_validate(updated_album)
 
 @router.delete("/{album_id}")
 def delete_album(album_id: int, db: Session = Depends(get_db)):
@@ -33,14 +33,16 @@ def delete_album(album_id: int, db: Session = Depends(get_db)):
     return {"message": "Album deleted successfully"}
 
 # Пагинация для получения всех альбомов
-@router.get("/albums/", response_model=schemas.PaginatedResponse[schemas.Album])
+@router.get("/", response_model=schemas.PaginatedResponse[schemas.Album])
 def get_albums(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     query = db.query(models.Album)
     total_count = query.count()
     albums = query.offset(skip).limit(limit).all()
 
+    album_data = [schemas.Album.model_validate(album) for album in albums]
+
     return schemas.PaginatedResponse(
-        data=albums,
+        data=album_data,
         total_count=total_count,
         skip=skip,
         limit=limit

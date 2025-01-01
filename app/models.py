@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Text, Index
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import JSONB
 from app.database import Base
 
 class Artist(Base):
@@ -46,8 +47,13 @@ class Track(Base):
     lyrics = Column(Text)
     play_count = Column(Integer, default=0)
     mood = Column(String(50))
+    track_metadata = Column(JSONB, nullable=True)
 
     artist_id = Column(Integer, ForeignKey("artists.artist_id"), nullable=False)
     album_id = Column(Integer, ForeignKey("albums.album_id"), nullable=False)
     artist = relationship("Artist")
     album = relationship("Album", back_populates="tracks")
+
+    __table_args__ = (
+        Index('ix_track_metadata_trgm', 'track_metadata', postgresql_using='gin'),
+    )

@@ -7,7 +7,7 @@ from app import models, schemas, crud
 
 router = APIRouter(prefix="/tracks", tags=["tracks"])
 
-@router.post("/", response_model=schemas.Track)
+@router.post("/create", response_model=schemas.Track)
 def create_track(track: schemas.TrackCreate, db: Session = Depends(get_db)):
     return crud.create_track(db, track)
 
@@ -16,14 +16,14 @@ def get_track(track_id: int, db: Session = Depends(get_db)):
     track = crud.get_track(db, track_id)
     if not track:
         raise HTTPException(status_code=404, detail="Track not found")
-    return track
+    return schemas.Track.model_validate(track)
 
 @router.put("/{track_id}", response_model=schemas.Track)
 def update_track(track_id: int, track: schemas.TrackUpdate, db: Session = Depends(get_db)):
     updated_track = crud.update_track(db, track_id, track)
     if not updated_track:
         raise HTTPException(status_code=404, detail="Track not found")
-    return updated_track
+    return schemas.Track.model_validate(updated_track)
 
 @router.delete("/{track_id}")
 def delete_track(track_id: int, db: Session = Depends(get_db)):
@@ -33,14 +33,16 @@ def delete_track(track_id: int, db: Session = Depends(get_db)):
     return {"message": "Track deleted successfully"}
 
 # Пагинация для получения всех треков
-@router.get("/tracks/", response_model=schemas.PaginatedResponse[schemas.Track])
+@router.get("/", response_model=schemas.PaginatedResponse[schemas.Track])
 def get_tracks(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     query = db.query(models.Track)
     total_count = query.count()
     tracks = query.offset(skip).limit(limit).all()
 
+    track_data = [schemas.Track.model_validate(track) for track in tracks]
+
     return schemas.PaginatedResponse(
-        data=tracks,
+        data=track_data,
         total_count=total_count,
         skip=skip,
         limit=limit

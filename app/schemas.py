@@ -35,6 +35,7 @@ class Artist(ArtistBase):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 # ----- Album Schemas -----
 class AlbumCreate(AlbumBase):
@@ -49,6 +50,7 @@ class Album(AlbumBase):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 # ----- Track Schemas -----
 class TrackCreate(TrackBase):
@@ -65,6 +67,7 @@ class Track(TrackBase):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 T = TypeVar("T")
 

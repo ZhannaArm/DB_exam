@@ -46,7 +46,7 @@
         </div>
         <div class="card-grid">
           <div v-for="album in albums" :key="album.album_id" class="card">
-            <h3>{{ album.name }}</h3>
+            <h3>{{ album.title }}</h3>
             <p>Год выпуска: {{ album.release_year }}</p>
             <p>Артист: {{ getArtistName(album.artist_id) }}</p>
             <div class="card-actions">
@@ -64,9 +64,9 @@
         </div>
         <div class="card-grid">
           <div v-for="track in tracks" :key="track.track_id" class="card">
-            <h3>{{ track.name }}</h3>
-            <p>Длительность: {{ track.duration }} мин</p>
-            <p>Альбом: {{ getAlbumName(track.album_id) }}</p>
+            <h3>{{ track.title }}</h3>
+            <p>Длительность: {{ track.duration }} сек</p>
+            <p>Артист: {{ getArtistName(track.artist_id) }}</p>
             <div class="card-actions">
               <button class="btn-secondary" @click="editTrack(track)">Редактировать</button>
               <button class="btn-danger" @click="deleteTrack(track.track_id)">Удалить</button>
@@ -79,23 +79,44 @@
     <div v-if="showArtistForm || showAlbumForm || showTrackForm" class="modal">
       <form @submit.prevent="saveEntity">
         <h2>{{ formTitle }}</h2>
-        <div v-if="showArtistForm">
-          <label>Имя: <input v-model="formData.name" /></label>
-          <label>Жанр: <input v-model="formData.genre" /></label>
-          <label>Год дебюта: <input type="number" v-model="formData.debut_year" /></label>
-          <label>Страна: <input v-model="formData.country" /></label>
-        </div>
+        <div class="form-content">
+          <div v-if="showArtistForm">
+            <label>Имя*: <input v-model="formData.name" required /></label>
+            <label>Жанр*: <input v-model="formData.genre" required /></label>
+            <label>Страна (необязательно): <input v-model="formData.country" /></label>
+            <label>Год дебюта (необязательно): <input type="number" v-model="formData.debut_year" /></label>
+            <div class="form-group">
+              <label>Биография (необязательно): </label>
+              <textarea v-model="formData.biography"></textarea>
+            </div>
+            <label>Веб-сайт (необязательно): <input type="url" v-model="formData.website" /></label>
+          </div>
 
-        <div v-if="showAlbumForm">
-          <label>Название: <input v-model="formData.name" /></label>
-          <label>Год выпуска: <input type="number" v-model="formData.release_year" /></label>
-          <label>ID артиста: <input v-model="formData.artist_id" /></label>
-        </div>
+          <div v-if="showAlbumForm">
+            <label>Название*: <input v-model="formData.title" required /></label>
+            <label>Год выпуска (необязательно): <input type="number" v-model="formData.release_year" /></label>
+            <label>Лейбл (необязательно): <input v-model="formData.record_label" /></label>
+            <label>Жанр (необязательно): <input v-model="formData.genre" /></label>
+            <label>Язык (необязательно): <input v-model="formData.language" /></label>
+            <label>ID артиста*: <input v-model="formData.artist_id" required /></label>
+          </div>
 
-        <div v-if="showTrackForm">
-          <label>Название: <input v-model="formData.name" /></label>
-          <label>Длительность: <input type="number" v-model="formData.duration" /></label>
-          <label>ID альбома: <input v-model="formData.album_id" /></label>
+          <div v-if="showTrackForm">
+            <label>Название*: <input v-model="formData.title" required /></label>
+            <label>Длительность (в секундах)*: <input type="number" v-model="formData.duration" required /></label>
+            <div class="form-group">
+              <label>Текст песни (необязательно): </label>
+              <textarea v-model="formData.lyrics"></textarea>
+            </div>
+            <label>Просмотры (необязательно): <input type="number" v-model="formData.play_count" /></label>
+            <label>Настроение (необязательно): <input v-model="formData.mood" /></label>
+
+            <label>Рейтинг (необязательно): <input type="number" v-model="formData.rating" /></label>
+            <label>Музыкальные инструменты (необязательно): <input v-model="formData.instruments" /></label>
+
+            <label>ID артиста*: <input v-model="formData.artist_id" required /></label>
+            <label>ID альбома (необязательно): <input v-model="formData.album_id" /></label>
+          </div>
         </div>
 
         <div class="modal-actions">

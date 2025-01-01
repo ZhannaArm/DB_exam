@@ -24,6 +24,17 @@ const app = Vue.createApp({
         : this.showAlbumForm
         ? "albums"
         : "tracks";
+
+      if (this.showTrackForm) {
+        this.formData.track_metadata = {};
+        if (this.formData.rating) this.formData.track_metadata.rating = this.formData.rating;
+        if (this.formData.instruments) this.formData.track_metadata.instruments = this.formData.instruments;
+
+        if (Object.keys(this.formData.track_metadata).length === 0) {
+          this.formData.track_metadata = null;
+        }
+      }
+
       if (this.formData.id) {
         await axios.put(`${this.apiUrl}${entity}/${this.formData.id}`, this.formData);
       } else {
@@ -42,6 +53,10 @@ const app = Vue.createApp({
     },
     editEntity(entity, data) {
       this.formData = { ...data };
+      if (entity === "tracks" && this.formData.track_metadata) {
+        this.formData.rating = this.formData.track_metadata.rating || null;
+        this.formData.instruments = this.formData.track_metadata.instruments || null;
+      }
       if (entity === "artists") this.showArtistForm = true;
       if (entity === "albums") this.showAlbumForm = true;
       if (entity === "tracks") this.showTrackForm = true;

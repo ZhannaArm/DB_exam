@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music API UI</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>🎵 Music API Dashboard</h1>
+      <nav>
+        <button :class="{ active: activeTab === 'artists' }" @click="switchTab('artists')">Артисты</button>
+        <button :class="{ active: activeTab === 'albums' }" @click="switchTab('albums')">Альбомы</button>
+        <button :class="{ active: activeTab === 'tracks' }" @click="switchTab('tracks')">Треки</button>
+      </nav>
+    </header>
+
+    <main>
+      <section v-if="activeTab === 'artists'">
+        <div class="section-header">
+          <h2>Артисты</h2>
+          <button class="btn-primary" @click="showArtistForm = true">+ Добавить артиста</button>
+        </div>
+        <div class="card-grid">
+          <div v-for="artist in artists" :key="artist.artist_id" class="card">
+            <h3>{{ artist.name }}</h3>
+            <p>Жанр: {{ artist.genre }}</p>
+            <p>Год дебюта: {{ artist.debut_year }}</p>
+            <p>Страна: {{ artist.country }}</p>
+            <div class="card-actions">
+              <button class="btn-secondary" @click="editArtist(artist)">Редактировать</button>
+              <button class="btn-danger" @click="deleteArtist(artist.artist_id)">Удалить</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section v-if="activeTab === 'albums'">
+        <div class="section-header">
+          <h2>Альбомы</h2>
+          <button class="btn-primary" @click="showAlbumForm = true">+ Добавить альбом</button>
+        </div>
+        <div class="card-grid">
+          <div v-for="album in albums" :key="album.album_id" class="card">
+            <h3>{{ album.name }}</h3>
+            <p>Год выпуска: {{ album.release_year }}</p>
+            <p>Артист: {{ getArtistName(album.artist_id) }}</p>
+            <div class="card-actions">
+              <button class="btn-secondary" @click="editAlbum(album)">Редактировать</button>
+              <button class="btn-danger" @click="deleteAlbum(album.album_id)">Удалить</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section v-if="activeTab === 'tracks'">
+        <div class="section-header">
+          <h2>Треки</h2>
+          <button class="btn-primary" @click="showTrackForm = true">+ Добавить трек</button>
+        </div>
+        <div class="card-grid">
+          <div v-for="track in tracks" :key="track.track_id" class="card">
+            <h3>{{ track.name }}</h3>
+            <p>Длительность: {{ track.duration }} мин</p>
+            <p>Альбом: {{ getAlbumName(track.album_id) }}</p>
+            <div class="card-actions">
+              <button class="btn-secondary" @click="editTrack(track)">Редактировать</button>
+              <button class="btn-danger" @click="deleteTrack(track.track_id)">Удалить</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div v-if="showArtistForm || showAlbumForm || showTrackForm" class="modal">
+      <form @submit.prevent="saveEntity">
+        <h2>{{ formTitle }}</h2>
+        <div v-if="showArtistForm">
+          <label>Имя: <input v-model="formData.name" /></label>
+          <label>Жанр: <input v-model="formData.genre" /></label>
+          <label>Год дебюта: <input type="number" v-model="formData.debut_year" /></label>
+          <label>Страна: <input v-model="formData.country" /></label>
+        </div>
+
+        <div v-if="showAlbumForm">
+          <label>Название: <input v-model="formData.name" /></label>
+          <label>Год выпуска: <input type="number" v-model="formData.release_year" /></label>
+          <label>ID артиста: <input v-model="formData.artist_id" /></label>
+        </div>
+
+        <div v-if="showTrackForm">
+          <label>Название: <input v-model="formData.name" /></label>
+          <label>Длительность: <input type="number" v-model="formData.duration" /></label>
+          <label>ID альбома: <input v-model="formData.album_id" /></label>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-primary" type="submit">Сохранить</button>
+          <button class="btn-secondary" type="button" @click="closeForm">Отмена</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

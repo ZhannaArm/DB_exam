@@ -55,7 +55,7 @@ class Album(AlbumBase):
 # ----- Track Schemas -----
 class TrackCreate(TrackBase):
     artist_id: int
-    album_id: int
+    album_id: Optional[int] = None
 
 class TrackUpdate(TrackBase):
     pass
@@ -63,7 +63,7 @@ class TrackUpdate(TrackBase):
 class Track(TrackBase):
     track_id: int
     artist_id: int
-    album_id: int
+    album_id: Optional[int] = None
 
     class Config:
         orm_mode = True

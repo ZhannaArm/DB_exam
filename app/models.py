@@ -50,7 +50,7 @@ class Track(Base):
     track_metadata = Column(JSONB, nullable=True)
 
     artist_id = Column(Integer, ForeignKey("artists.artist_id"), nullable=False)
-    album_id = Column(Integer, ForeignKey("albums.album_id"), nullable=False)
+    album_id = Column(Integer, ForeignKey("albums.album_id"), nullable=True)
     artist = relationship("Artist")
     album = relationship("Album", back_populates="tracks")
 

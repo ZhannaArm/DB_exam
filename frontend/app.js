@@ -5,6 +5,9 @@ const app = Vue.createApp({
       artists: [],
       albums: [],
       tracks: [],
+      currentPage: 1,
+      itemsPerPage: 10,
+      totalItems: 0,
       showArtistForm: false,
       showAlbumForm: false,
       showTrackForm: false,
@@ -12,11 +15,40 @@ const app = Vue.createApp({
       apiUrl: "http://127.0.0.1:8000/",
     };
   },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.totalItems / this.itemsPerPage);
+    },
+  },
   methods: {
     async loadEntities(entity) {
-      const response = await axios.get(`${this.apiUrl}${entity}/`);
-      console.log("Loaded data:", response.data);
-      this[entity] = response.data.data;
+      const skip = (this.currentPage - 1) * this.itemsPerPage;
+      const limit = this.itemsPerPage;
+
+      try {
+        const response = await axios.get(`${this.apiUrl}${entity}/`, {
+          params: { skip, limit },
+        });
+
+        console.log(`Loaded ${entity}:`, response.data);
+
+        this[entity] = response.data.data;
+        this.totalItems = response.data.total_count;
+      } catch (error) {
+        console.error(`Error loading ${entity}:`, error);
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+        this.loadEntities(this.activeTab);
+      }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+        this.loadEntities(this.activeTab);
+      }
     },
     async saveEntity() {
       const entity = this.showArtistForm
@@ -89,7 +121,9 @@ const app = Vue.createApp({
     },
     switchTab(tab) {
       this.activeTab = tab;
+      this.currentPage = 1;
       localStorage.setItem("activeTab", tab);
+      this.loadEntities(this.activeTab);
     },
   },
   mounted() {

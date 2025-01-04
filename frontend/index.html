@@ -74,6 +74,12 @@
           </div>
         </div>
       </section>
+
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage === 1">⬅ Предыдущая</button>
+        <span>Страница {{ currentPage }} из {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages">Следующая ➡</button>
+      </div>
     </main>
 
     <div v-if="showArtistForm || showAlbumForm || showTrackForm" class="modal">

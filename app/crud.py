@@ -28,10 +28,6 @@ def delete_artist(db: Session, artist_id: int):
     db_artist = db.query(models.Artist).filter(models.Artist.artist_id == artist_id).first()
     if not db_artist:
         return None
-
-    db.query(models.Track).filter(models.Track.artist_id == artist_id).delete()
-    db.query(models.Album).filter(models.Album.artist_id == artist_id).delete()
-
     db.delete(db_artist)
     db.commit()
     return db_artist

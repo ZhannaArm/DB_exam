@@ -9,12 +9,13 @@ class Artist(Base):
     artist_id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True, nullable=False)
     genre = Column(String, nullable=False)
-    country = Column(String(50))
+    country = Column(String(100))
     debut_year = Column(Integer)
     biography = Column(Text)
-    website = Column(String(200), nullable=True)
+    website = Column(String(255), nullable=True)
 
-    albums = relationship("Album", back_populates="artist")
+    albums = relationship("Album", back_populates="artist", cascade="all, delete-orphan")
+    tracks = relationship("Track", back_populates="artist", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_artist_country', 'country'),
@@ -32,6 +33,7 @@ class Album(Base):
 
     artist_id = Column(Integer, ForeignKey("artists.artist_id"), nullable=False)
     artist = relationship("Artist", back_populates="albums")
+
     tracks = relationship("Track", back_populates="album", cascade="all, delete-orphan")
 
     __table_args__ = (
@@ -51,7 +53,8 @@ class Track(Base):
 
     artist_id = Column(Integer, ForeignKey("artists.artist_id"), nullable=False)
     album_id = Column(Integer, ForeignKey("albums.album_id"), nullable=True)
-    artist = relationship("Artist")
+
+    artist = relationship("Artist", back_populates="tracks")
     album = relationship("Album", back_populates="tracks")
 
     __table_args__ = (

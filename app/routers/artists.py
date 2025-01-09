@@ -94,7 +94,7 @@ def get_artists_with_albums(db: Session = Depends(get_db)):
 # Получить всех артистов, отсортированных по году дебюта или имени.
 @router.get("/sort/", response_model=List[schemas.Artist])
 def sort_artists(sort_by: str = "debut_year", db: Session = Depends(get_db)):
-    valid_fields = ["name", "debut_year", "genre"]  # Добавьте другие поля для сортировки, если нужно
+    valid_fields = ["name", "debut_year", "genre"]
     if sort_by not in valid_fields:
         raise HTTPException(status_code=400, detail="Invalid sort field")
 
